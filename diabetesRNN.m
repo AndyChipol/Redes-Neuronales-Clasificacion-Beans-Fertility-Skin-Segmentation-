@@ -1,0 +1,44 @@
+function diabetesRNN
+load('Diabetes\diabetesA.txt')
+
+[m,n] = size(diabetesA);
+X = diabetesA(:,1:19)';
+
+t = [];
+for i=1:m
+    if(diabetesA(i,20)==0) t=[t [1;0;0]];
+    else if(diabetesA(i,20)==1) t = [t,[0;1;0]];
+        end
+    end
+end
+
+RNUnaN = newff(minmax(X),[11,3],{'logsig','logsig'},'traincgf');
+RNEntrenada.trainParam.epochs = 10000%;
+RNEntrenada.trainParam.min_grad = 1e-27%;
+RNEntrenada.trainParam.show = 1;
+RNEntrenada.trainParam.time = 600;
+RNEntrenada = train(RNUnaN,X,t);
+Y = sim(RNEntrenada, X)
+
+tt = [];
+for j=1:m
+    [vm,pos]=max(Y(:,j));
+    if(pos==1) tt=[tt [1;0;0;]];
+    else if(pos==2) tt = [tt [0;1;0]];
+        end
+    end
+end
+
+%comparar Aciertos
+aciertos = 0;
+for i=1:m
+    [a,pos1] = max(t(:,i));[aa,pos2] = max(tt(:,i));
+    if (pos1 == pos2)
+        aciertos = aciertos+1;
+    end
+end
+
+porcentaje = (aciertos/m)*100
+
+save diabetesTrain RNEntrenada
+save diabetesTrainPorciernto porcentaje
